@@ -1,32 +1,34 @@
 package service
 
 import (
-	"AuthService/configs"
-	"AuthService/internal/domain"
+	"context"
 	"errors"
+	"github.com/Holocron1/authservice/internal/domain"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
-type UserService interface {
-	ValidateCredentials(username, password string) (bool, error)
-	GenerateToken(username string) (string, error)
-	RefreshToken(token string) (string, error)
-}
-
 type UserServiceImpl struct {
 	UserStore UserStore
+	JWTSecret string
+	JWTTTL    time.Duration
+}
+
+func NewUserServiceImpl(store UserStore, JWTSecret string, JWTTTL time.Duration) *UserServiceImpl {
+	return &UserServiceImpl{UserStore: store, JWTSecret: JWTSecret, JWTTTL: JWTTTL}
 }
 
 type UserStore interface {
-	Get(username string) (domain.User, error)
+	Get(ctx context.Context, username string) (domain.User, error)
 }
 
-func (u *UserServiceImpl) ValidateCredentials(username, password string) (bool, error) {
-	user, err := u.UserStore.Get(username)
+var ErrUserNotFound = errors.New("user not found")
+
+func (u *UserServiceImpl) ValidateCredentials(ctx context.Context, username, password string) (bool, error) {
+	user, err := u.UserStore.Get(ctx, username)
 	if err != nil {
-		return false, errors.New("User not found")
+		return false, ErrUserNotFound
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
@@ -35,27 +37,29 @@ func (u *UserServiceImpl) ValidateCredentials(username, password string) (bool, 
 	return true, nil
 }
 
-func (u *UserServiceImpl) GenerateToken(username string) (string, error) {
+const issuer = "auth-service"
+
+func (u *UserServiceImpl) GenerateToken(ctx context.Context, username string) (string, error) {
 	claims := jwt.RegisteredClaims{
-		Issuer:    "auth-service",
+		Issuer:    issuer,
 		Subject:   username,
 		Audience:  nil,
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(configs.LoadConfig().JWT_TTL)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(u.JWTTTL)),
 		NotBefore: nil,
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		ID:        "",
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(configs.LoadConfig().JWT_SECRET))
+	return token.SignedString([]byte(u.JWTSecret))
 }
 
-func (u *UserServiceImpl) RefreshToken(token string) (string, error) {
-	newToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) { return []byte(configs.LoadConfig().JWT_SECRET), nil })
+func (u *UserServiceImpl) RefreshToken(ctx context.Context, token string) (string, error) {
+	newToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) { return []byte(u.JWTSecret), nil })
 	if newToken == nil || err != nil {
 		return "", errors.New("Invalid token")
 	}
 
 	username, _ := newToken.Claims.GetSubject()
-	return u.GenerateToken(username)
+	return u.GenerateToken(ctx, username)
 }

@@ -10,80 +10,12 @@
 package mocks
 
 import (
-	domain "AuthService/internal/domain"
+	context "context"
 	reflect "reflect"
 
+	domain "github.com/Holocron1/authservice/internal/domain"
 	gomock "go.uber.org/mock/gomock"
 )
-
-// MockUserService is a mock of UserService interface.
-type MockUserService struct {
-	ctrl     *gomock.Controller
-	recorder *MockUserServiceMockRecorder
-	isgomock struct{}
-}
-
-// MockUserServiceMockRecorder is the mock recorder for MockUserService.
-type MockUserServiceMockRecorder struct {
-	mock *MockUserService
-}
-
-// NewMockUserService creates a new mock instance.
-func NewMockUserService(ctrl *gomock.Controller) *MockUserService {
-	mock := &MockUserService{ctrl: ctrl}
-	mock.recorder = &MockUserServiceMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
-	return m.recorder
-}
-
-// GenerateToken mocks base method.
-func (m *MockUserService) GenerateToken(username string) (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GenerateToken", username)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GenerateToken indicates an expected call of GenerateToken.
-func (mr *MockUserServiceMockRecorder) GenerateToken(username any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateToken", reflect.TypeOf((*MockUserService)(nil).GenerateToken), username)
-}
-
-// RefreshToken mocks base method.
-func (m *MockUserService) RefreshToken(token string) (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RefreshToken", token)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// RefreshToken indicates an expected call of RefreshToken.
-func (mr *MockUserServiceMockRecorder) RefreshToken(token any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RefreshToken", reflect.TypeOf((*MockUserService)(nil).RefreshToken), token)
-}
-
-// ValidateCredentials mocks base method.
-func (m *MockUserService) ValidateCredentials(username, password string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ValidateCredentials", username, password)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ValidateCredentials indicates an expected call of ValidateCredentials.
-func (mr *MockUserServiceMockRecorder) ValidateCredentials(username, password any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateCredentials", reflect.TypeOf((*MockUserService)(nil).ValidateCredentials), username, password)
-}
 
 // MockUserStore is a mock of UserStore interface.
 type MockUserStore struct {
@@ -110,16 +42,16 @@ func (m *MockUserStore) EXPECT() *MockUserStoreMockRecorder {
 }
 
 // Get mocks base method.
-func (m *MockUserStore) Get(username string) (domain.User, error) {
+func (m *MockUserStore) Get(ctx context.Context, username string) (domain.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", username)
+	ret := m.ctrl.Call(m, "Get", ctx, username)
 	ret0, _ := ret[0].(domain.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockUserStoreMockRecorder) Get(username any) *gomock.Call {
+func (mr *MockUserStoreMockRecorder) Get(ctx, username any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockUserStore)(nil).Get), username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockUserStore)(nil).Get), ctx, username)
 }

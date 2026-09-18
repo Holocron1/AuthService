@@ -7,21 +7,21 @@ import (
 )
 
 type Config struct {
-	HTTP_PORT    string
-	DATABASE_URL string
-	JWT_SECRET   string
-	JWT_TTL      time.Duration
+	HTTPPort    string        `env:"HTTP_PORT"`
+	DatabaseURL string        `env:"DATABASE_URL"`
+	JWTSecret   string        `env:"JWT_SECRET"`
+	JWTTTL      time.Duration `env:"JWT_TTL"`
 }
 
 func LoadConfig() *Config {
 	c := new(Config)
-	c.HTTP_PORT = os.Getenv("HTTP_PORT")
-	c.DATABASE_URL = os.Getenv("DATABASE_URL")
-	c.JWT_SECRET = os.Getenv("JWT_SECRET")
+	c.HTTPPort = os.Getenv("HTTP_PORT")
+	c.DatabaseURL = os.Getenv("DATABASE_URL")
+	c.JWTSecret = os.Getenv("JWT_SECRET")
 	duration, err := time.ParseDuration(os.Getenv("JWT_TTL"))
 	if err != nil {
 		log.Println("Invalid JWT TTL")
 	}
-	c.JWT_TTL = duration
+	c.JWTTTL = duration
 	return c
 }

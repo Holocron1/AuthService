@@ -1,8 +1,8 @@
 package store
 
 import (
-	"AuthService/internal/domain"
 	"errors"
+	"github.com/Holocron1/authservice/internal/domain"
 	"golang.org/x/crypto/bcrypt"
 )
 
