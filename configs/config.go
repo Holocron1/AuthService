@@ -1,8 +1,7 @@
 package configs
 
 import (
-	"log"
-	"os"
+	"github.com/spf13/viper"
 	"time"
 )
 
@@ -14,14 +13,11 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
+	viper.AutomaticEnv()
 	c := new(Config)
-	c.HTTPPort = os.Getenv("HTTP_PORT")
-	c.DatabaseURL = os.Getenv("DATABASE_URL")
-	c.JWTSecret = os.Getenv("JWT_SECRET")
-	duration, err := time.ParseDuration(os.Getenv("JWT_TTL"))
-	if err != nil {
-		log.Println("Invalid JWT TTL")
-	}
-	c.JWTTTL = duration
+	c.HTTPPort = viper.GetString("HTTP_PORT")
+	c.DatabaseURL = viper.GetString("DATABASE_URL")
+	c.JWTSecret = viper.GetString("JWT_SECRET")
+	c.JWTTTL = viper.GetDuration("JWT_TTL")
 	return c
 }
