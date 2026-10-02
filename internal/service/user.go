@@ -30,10 +30,15 @@ func (u *UserServiceImpl) ValidateCredentials(ctx context.Context, username, pas
 	if err != nil {
 		return false, ErrUserNotFound
 	}
+
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return false, errors.New("Wrong password")
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return false, nil
+		}
+		return false, err
 	}
+
 	return true, nil
 }
 

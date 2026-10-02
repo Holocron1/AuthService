@@ -10,6 +10,7 @@ type Config struct {
 	DatabaseURL string        `env:"DATABASE_URL"`
 	JWTSecret   string        `env:"JWT_SECRET"`
 	JWTTTL      time.Duration `env:"JWT_TTL"`
+	GRPCPort    string        `env:"GRPC_PORT"`
 }
 
 func LoadConfig() *Config {
@@ -19,5 +20,6 @@ func LoadConfig() *Config {
 	c.DatabaseURL = viper.GetString("DATABASE_URL")
 	c.JWTSecret = viper.GetString("JWT_SECRET")
 	c.JWTTTL = viper.GetDuration("JWT_TTL")
+	c.GRPCPort = viper.GetString("GRPC_PORT")
 	return c
 }

@@ -16,11 +16,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+      - "50051:50051"
     environment:
       DATABASE_URL: "postgres://firstUser:userPass@postgres:5432/firstDatabase?sslmode=disable"
       JWT_SECRET: "random-text-123"
       JWT_TTL: "60m"
       HTTP_PORT: "8080"
+      GRPC_PORT: "50051"
     depends_on:
       postgres:
         condition: service_healthy
